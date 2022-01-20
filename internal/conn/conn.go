@@ -293,17 +293,21 @@ func (c *Conn) copyFromTargetToClient() error {
 func (c *Conn) dialTarget(
 	ctx context.Context, config *pgconn.Config, startup *pgproto3.StartupMessage,
 ) error {
-	// Copy default run-time params
-	for k, v := range config.RuntimeParams {
-		startup.Parameters[k] = v
+	config = config.Copy()
+	if c.cfg.ReportRemoteAddr {
+		config.RuntimeParams["crdb:remote_addr"] = c.clientConn.RemoteAddr().String()
 	}
-	if config.User != "" {
-		startup.Parameters["user"] = config.User
+	// Copy any runtime parameters we don't already know about.
+	for k, v := range startup.Parameters {
+		// Sanity-check here.
+		if k == "user" {
+			continue
+		}
+		if _, found := config.RuntimeParams[k]; !found {
+			config.RuntimeParams[k] = v
+		}
 	}
-	if config.Database != "" {
-		startup.Parameters["database"] = config.Database
-	}
-	log.WithField("params", startup.Parameters).Trace("startup")
+	log.WithField("params", config.RuntimeParams).Trace("startup")
 
 	pgConn, err := pgconn.ConnectConfig(ctx, config)
 	if err != nil {

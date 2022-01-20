@@ -48,6 +48,7 @@ type Config struct {
 	JwtField          string        // The JWT claim field to use when selecting a backend.
 	MetricsAddr       string        // Address to bind the prometheus metrics server to.
 	Refresh           time.Duration // Duration between refreshing configuration data.
+	ReportRemoteAddr  bool          // If true, add a crdb:remote_addr connection param.
 	oidcDiscovery     string        // A URL to an OIDC discovery document.
 }
 
@@ -88,6 +89,9 @@ func (c *Config) Bind(f *pflag.FlagSet) {
 	f.BoolVar(&c.insecure, "insecure", false, "this flag must be set if no TLS configuration is provided")
 	f.DurationVar(&c.Refresh, "refresh", 24*time.Hour,
 		"how often to refresh configuration data; set to 0 to disable; kill -HUP to manually refresh")
+	f.BoolVar(&c.ReportRemoteAddr, "reportRemoteAddr", false,
+		"if true, set the crdb:remote_addr connection parameter; "+
+			"requires COCKROACH_TRUST_CLIENT_PROVIDED_SQL_REMOTE_ADDR=true in the CRDB cluster environment")
 	f.StringVar(&c.MetricsAddr, "metricsAddr", "", "an address to bind a metrics HTTP server to")
 	f.StringVar(&c.oidcDiscovery, "oidcDiscovery", "",
 		"the URL of an OIDC discovery document to bootstrap public signing keys")
