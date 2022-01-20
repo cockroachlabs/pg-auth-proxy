@@ -30,7 +30,7 @@ The automated tests run against multiple versions of CockroachDB and PostgreSQL.
 ```
 % ./pg-auth-proxy start --help
 Usage:
-  pg-jwt-proxy start [flags]
+  pg-auth-proxy start [flags]
 
 Examples:
 
@@ -56,6 +56,7 @@ Flags:
       --metricsAddr string     an address to bind a metrics HTTP server to
       --oidcDiscovery string   the URL of an OIDC discovery document to bootstrap public signing keys
       --refresh duration       how often to refresh configuration data; set to 0 to disable; kill -HUP to manually refresh (default 24h0m0s)
+      --reportRemoteAddr       if true, set the crdb:remote_addr connection parameter; requires COCKROACH_TRUST_CLIENT_PROVIDED_SQL_REMOTE_ADDR=true in the CRDB cluster environment
       --signingKeys strings    additional PEM-formatted public key or certificate files
 
 Global Flags:

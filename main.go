@@ -37,7 +37,7 @@ func main() {
 	var logFormat, logDestination string
 	var verbosity int
 	root := &cobra.Command{
-		Use:           "pg-jwt-proxy",
+		Use:           "pg-auth-proxy",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
