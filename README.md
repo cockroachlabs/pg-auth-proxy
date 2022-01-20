@@ -65,6 +65,11 @@ Global Flags:
   -v, --verbose count           increase logging verbosity to debug; repeat for trace
 ```
 
+## Monitoring
+
+The `--metricsAddr` flag will start an HTTP server that provides a Prometheus-compatible endpoint
+at `/vars`. There is also a `/health` endpoint which always return OK.
+
 ## Future work
 
 The proxy does not support authorizing connections. That it, it does not perform user management or
@@ -72,4 +77,5 @@ dynamic role assignments to SQL users in the backend. This would be relatively s
 implement via custom claims in the JWT token, or by implementing the SCIM protocol.
 
 If presenting the JWT token via cleartext password authentication is infeasible, perhaps due to
-string-length restrictions, an alternate means of passing the token could be performed by 
+string-length restrictions, an alternate means of passing the token could be performed by requiring
+the client to issue a "magic" `SELECT proxy_login(....)` statement.
