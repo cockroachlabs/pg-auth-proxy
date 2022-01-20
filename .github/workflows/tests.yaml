@@ -1,0 +1,75 @@
+name: Tests
+permissions: read-all
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+env:
+  GO_VERSION: 1.17
+
+jobs:
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: crlfmt returns no deltas
+        if: ${{ always() }}
+        run: |
+          DELTA=$(go run github.com/cockroachdb/crlfmt .)
+          echo $DELTA
+          test -z "$DELTA"
+
+      - name: Lint
+        if: ${{ always() }}
+        run: go run golang.org/x/lint/golint -set_exit_status ./...
+
+      - name: Static checks
+        if: ${{ always() }}
+        run: go run honnef.co/go/tools/cmd/staticcheck -checks all ./...
+
+  integration:
+    name: Integration Tests ${{ matrix.db }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - db: cockroachdb-v21.2
+            connect: postgres://root@127.0.0.1:26257?sslmode=disable
+          - db: cockroachdb-v21.1
+            connect: postgres://root@127.0.0.1:26257?sslmode=disable
+          - db: cockroachdb-v20.2
+            connect: postgres://root@127.0.0.1:26257?sslmode=disable
+          - db: postgres-v14
+            connect: postgres://postgres:SoupOrSecret@127.0.0.1/postgres?sslmode=disable
+          - db: postgres-v13
+            connect: postgres://postgres:SoupOrSecret@127.0.0.1/postgres?sslmode=disable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Start Database
+        working-directory: .github
+        run: docker-compose up -d ${{ matrix.db }}
+
+      - name: Go Tests
+        env:
+          TEST_CONNECT_STRING: ${{ matrix.connect }}
+        run: go test -v -race ./...
+
+      - name: Stop CockroachDB
+        if: ${{ always() }}
+        working-directory: .github
+        run: docker-compose down

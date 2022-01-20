@@ -1,0 +1,4 @@
+{
+  "#": "Just test that we find the one field we care about",
+  "jwks_uri": "/testdata/rfc7517-example.jwks"
+}

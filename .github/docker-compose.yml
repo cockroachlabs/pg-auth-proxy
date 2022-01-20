@@ -1,0 +1,33 @@
+# This compose file contains recipes that are called from the GitHub
+# Actions workflows.
+version: "3.9"
+services:
+  cockroachdb-v21.2:
+    image: cockroachdb/cockroach:latest-v21.2
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+  cockroachdb-v21.1:
+    image: cockroachdb/cockroach:latest-v21.1
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+  cockroachdb-v20.2:
+    image: cockroachdb/cockroach:latest-v20.2
+    command: start-single-node --insecure
+    ports:
+      - "26257:26257"
+  postgres-v14:
+    image: postgres:14
+    environment:
+      POSTGRES_PASSWORD: SoupOrSecret
+    command: "-d postgres"
+    ports:
+      - "5432:5432"
+  postgres-v13:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: SoupOrSecret
+    command: "-d postgres"
+    ports:
+      - "5432:5432"
