@@ -9,9 +9,9 @@ PostgreSQL-compatible wire format.
 
 In its present incarnation, pg-auth-proxy adds support for using JSON Web Tokens (JWT) as a source
 of authentication (i.e. establishing the identity of an incoming connection). A JWT bearer token is
-presented to the proxy via cleartext password authentication. The proxy validates the token's
+presented, via TLS, to the proxy as though it were a cleartext password. The proxy validates the token's
 signature against a list of public keys that are retrieved from a JWKS document referenced by an
-OIDC discovery document or which are explicitly configured.
+OIDC discovery document or which are provided through explicit configuration.
 
 Upon receipt of a valid JWT claim, the proxy will consult a configuration file to map the `sub`
 field to a database connection string. This connection string may use password-based authentication,
